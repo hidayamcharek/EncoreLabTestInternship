@@ -1,0 +1,28 @@
+<div (scroll)="loadMore()">
+
+<div class="input-group">
+  <div class="form-outline">
+    <label class="form-label" for="search">Search</label>
+    <input type="text" [(ngModel)]="searchValue" id="search" class="form-control" />
+  </div>
+</div>
+<table class="table table-hover" >
+  <thead>
+  <tr>
+    <th scope="col">Photo</th>
+    <th scope="col">Author</th>
+    <th scope="col">Text</th>
+    <th scope="col">Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let album of albums | searchFilter:searchValue ">
+    <td><img src="{{album.photo}}"/></td>
+    <td>{{album.author}}</td>
+    <td>{{album.text}}</td>
+    <td><button type="button" class="btn btn-info" (click)="addToFav(album)">Add to fav</button></td>
+  </tr>
+  </tbody>
+</table>
+</div>
+<button type="button" class="btn btn-light"(click)="loadMore()">{{button}}</button>
