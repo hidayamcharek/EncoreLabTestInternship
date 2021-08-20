@@ -8,6 +8,8 @@ import { AlbumFavComponent } from './album-fav/album-fav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SearchFilterPipe } from './search-filter.pipe';
 import { FormsModule } from '@angular/forms';
+import {InfiniteScrollModule} from "ngx-infinite-scroll";
+import {NgxSpinnerModule} from "ngx-spinner";
 
 @NgModule({
   declarations: [
@@ -20,7 +22,9 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    InfiniteScrollModule,
+    NgxSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

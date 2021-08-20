@@ -1,4 +1,8 @@
-<div (scroll)="loadMore()">
+<div
+ infiniteScroll
+ [infiniteScrollDistance]="2"
+ [infiniteScrollThrottle]="50"
+ (scrolled)="onScroll()">
 
 <div class="input-group">
   <div class="form-outline">
@@ -20,9 +24,31 @@
     <td><img src="{{album.photo}}"/></td>
     <td>{{album.author}}</td>
     <td>{{album.text}}</td>
-    <td><button type="button" class="btn btn-info" (click)="addToFav(album)">Add to fav</button></td>
+    <td>
+      <button *ngIf="album.fav===false" type="button" class="btn btn-info" (click)="addToFav(album)">Add to fav</button>
+      <button *ngIf="album.fav===true" type="button" class="btn btn-danger" (click)="removeFromFav(album)">Delete from fav</button>
+    </td>
   </tr>
   </tbody>
 </table>
+  <!-- sinner -->
+  <div class="row pb-5">
+    <div class="col-md-12 p-5">
+      <ngx-spinner
+        bdOpacity = 0.9
+        bdColor = ""
+        size = "default"
+        color = "#581f87"
+        type = "ball-pulse-sync"
+        [fullScreen] = "false"
+      >
+      </ngx-spinner>
+    </div>
+  </div>
+  <!-- Alert no more post -->
+  <div *ngIf = "!notEmptyPost" class="row pb-5">
+    <div class="col-md-12 d-flex justify-content-center">
+      <div class="text-muted h6 alert alert-secondary p-2">No more items to show</div>
+    </div>
+  </div>
 </div>
-<button type="button" class="btn btn-light"(click)="loadMore()">{{button}}</button>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {AlbumDataService} from "../Services/album-data.service";
 import { LoremIpsum } from "lorem-ipsum";
 import {Album} from "../Models/Album.model";
+import {NgxSpinnerService} from "ngx-spinner";
 
 @Component({
   selector: 'app-album-list',
@@ -20,6 +21,9 @@ export class AlbumListComponent implements OnInit {
     }
   });
 
+  notEmptyPost = true;
+  notscrolly = true;
+
   // @ts-ignore
   searchValue: string;
 
@@ -27,47 +31,50 @@ export class AlbumListComponent implements OnInit {
   albums: Album[] = [];
   albumsToShow: Album[] = [];
   fav: Album[] = [];
-  i=0
-  button="Load more"
-  constructor(private albumDataService: AlbumDataService) { }
+  idsFav: [] = []
+  constructor(private albumDataService: AlbumDataService , private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
-    this.getFrom0to10()
     this.albumsToShow=this.albums
+    this.getFrom0to10()
+    // @ts-ignore
+    console.log(JSON.parse(localStorage.getItem('ids')))
   }
 
   addToFav(album:Album){
     this.fav.push(album)
+
+    for(let n = 0; n <= this.albums.length; n++){
+      if(album==this.albums[n]){
+        this.albums[n].fav=true;
+      }
+    }
+
     // @ts-ignore
     localStorage.setItem('fav', JSON.stringify(this.fav));
+    localStorage.setItem('ids', JSON.stringify(this.idsFav));
     console.log(localStorage.getItem('fav'));
-  }
-
-  loadMore(){
-    this.i++
-    if(this.i===1){
-      this.getFrom11to1083()
-    }
-    if(this.i===2){
-      this.getFrom1084to2166()
-    }
-    if(this.i===3){
-      this.getFrom2167to3250()
-    }
-    if(this.i===4){
-      this.getTheRest()
-    }
-    this.i++
-    this.pushIntoTheAlbum()
-    console.log(this.i)
-    if(this.i>=4){
-      this.button="no more content"
-    }
-  }
-
-  pushIntoTheAlbum(){
     // @ts-ignore
-    this.albumsToShow.push(this.albums.slice(this.albumsToShow.length,this.albumsToShow.length+10))
+    this.idsFav.push(album.id)
+    console.log(this.idsFav)
+  }
+
+  // @ts-ignore
+  removeFromFav(album){
+    this.fav.forEach( (item, index) => {
+      if(item === album) this.fav.splice(index,1);
+    });
+    this.idsFav.forEach( (item, index) => {
+      if(item === album.id) this.idsFav.splice(index,1);
+    });
+    localStorage.setItem('fav', JSON.stringify(this.fav));
+    localStorage.setItem('ids', JSON.stringify(this.idsFav));
+    for(let n = 0; n <= this.albums.length; n++){
+      if(album==this.albums[n]){
+        this.albums[n].fav=false;
+      }
+    }
+    console.log(localStorage.getItem('fav'));
   }
 
   getFrom0to10(){
@@ -75,50 +82,38 @@ export class AlbumListComponent implements OnInit {
       // @ts-ignore
       this.albumDataService.getPictures(n).subscribe((data: any[])=>{
         // @ts-ignore
-        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n).concat("/100/100"),data.author,this.lorem.generateSentences(1)));
+        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n).concat("/100/100"),data.author,this.lorem.generateSentences(1),false));
+
+
       })
     }
   }
-
-  getFrom11to1083(){
-    for(let n = 11; n <= 1083; n++){
+  getFromNext10(){
+    let x = this.albums.length;
+    if(x>=1083){
+      x=x-1083
+    }
+    if(x>=2116){
+      x=x-2116
+    }
+    if(x>=3249){
+      x=x-3249
+    }
+    for(let n = x; n <= x+10; n++){
       // @ts-ignore
       this.albumDataService.getPictures(n).subscribe((data: any[])=>{
         // @ts-ignore
-        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n).concat("/100/100"),data.author,this.lorem.generateSentences(1)));
+        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n).concat("/100/100"),data.author,this.lorem.generateSentences(1),false));
+
       })
     }
+    this.notscrolly = true;
   }
 
-
-  getFrom1084to2166(){
-    for(let n = 1084; n <= 2166; n++){
-      // @ts-ignore
-      this.albumDataService.getPictures(n-1083).subscribe((data: any[])=>{
-        // @ts-ignore
-        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n-1083).concat("/100/100"),data.author,this.lorem.generateSentences(1)));
-      })
+  onScroll() {
+    if (this.notscrolly && this.notEmptyPost) {
+      this.notscrolly = false;
+      this.getFromNext10();
     }
   }
-
-  getFrom2167to3250(){
-    for(let n = 2167; n <= 3251; n++){
-      // @ts-ignore
-      this.albumDataService.getPictures(n-2168).subscribe((data: any[])=>{
-        // @ts-ignore
-        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n-2168).concat("/100/100"),data.author,this.lorem.generateSentences(1)));
-      })
-    }
-  }
-  getTheRest(){
-    for(let n = 3249; n <= 4000; n++){
-      // @ts-ignore
-      this.albumDataService.getPictures(n-3250).subscribe((data: any[])=>{
-        // @ts-ignore
-        this.albums.push(new Album(data.id,"https://picsum.photos/id/".concat(n-3250).concat("/100/100"),data.author,this.lorem.generateSentences(1)));
-      })
-    }
-  }
-
-
 }
